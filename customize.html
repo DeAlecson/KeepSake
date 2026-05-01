@@ -271,8 +271,19 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
 
 /* ── MOBILE ── */
 @media (max-width: 820px) {
-  .step-body { grid-template-columns: 1fr; }
-  .preview-panel { position: static; }
+  /* Stack: preview ABOVE the form on mobile */
+  .step-body { display: flex; flex-direction: column; gap: 28px; }
+  .preview-panel {
+    order: -1;                         /* push preview to top */
+    position: static;
+    padding: 24px 20px;
+    flex-direction: row; flex-wrap: wrap;
+    gap: 20px; align-items: center;
+  }
+  .preview-puck { width: 140px; height: 110px; flex-shrink: 0; }
+  .preview-label { display: none; }    /* save space; "Live preview" is implied */
+  .preview-price-breakdown { flex: 1; min-width: 180px; }
+
   .checkout-grid { grid-template-columns: 1fr; }
   .order-summary { position: static; }
   .template-grid { grid-template-columns: repeat(2, 1fr); }

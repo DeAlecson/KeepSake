@@ -211,9 +211,11 @@ footer { background:rgba(0,0,0,0.3); border-top:1px solid rgba(244,234,222,0.07)
   .fx-hero { padding:120px 24px 60px; }
   .how-section, .reg-section { padding-left:24px; padding-right:24px; }
   .how-steps { grid-template-columns:1fr; }
-  .reg-form-grid { grid-template-columns:1fr; }
-  .pet-card-preview { position:static; }
+  /* Stack registration form: live card preview ABOVE inputs */
+  .reg-form-grid { display:flex; flex-direction:column; gap:28px; }
+  .pet-card-preview { order:-1; position:static; }
   .community-section { padding:60px 24px; }
+  .pet-grid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
   footer { padding:40px 24px; }
 }
 </style>

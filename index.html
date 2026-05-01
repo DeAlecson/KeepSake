@@ -1034,17 +1034,30 @@ footer {
   .newsletter-input-row input { border-right: 1px solid rgba(138,121,104,0.3); border-bottom: none; }
   .newsletter-input-row button { border-top: none; }
 
-  #hero { min-height: 100svh; align-items: flex-end; padding-bottom: 80px; }
-  .hero-content { padding: 120px 24px 0; max-width: 100%; }
-  .hero-title { font-size: clamp(2.6rem, 11vw, 4rem); }
+  /* Hero stacks vertically — content, then drop badge, then dots */
+  #hero {
+    min-height: 100svh; padding: 100px 0 100px;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: stretch;
+  }
+  .hero-content { padding: 0 24px; max-width: 100%; }
+  .hero-title { font-size: clamp(2.4rem, 10vw, 3.6rem); }
+  .hero-sub { max-width: 100%; margin-bottom: 32px; font-size: 0.98rem; }
   .hero-puck-illustration { display: none; }
+  .slide-img-placeholder { display: none; }     /* hide placeholder text that overlaps copy */
   .hero-drop-badge {
     position: static; transform: none;
-    margin-top: 32px; flex-direction: row; justify-content: flex-start;
-    padding: 0 24px;
+    margin: 36px 24px 0; flex-direction: row;
+    justify-content: flex-start; align-items: center;
+    flex-wrap: wrap; gap: 14px;
+    animation: fadeUp 1s 1.2s forwards;
   }
-  .drop-num-badge { width: 72px; height: 72px; }
-  .hero-dots { right: 24px; bottom: 24px; }
+  .drop-num-badge { width: 64px; height: 64px; }
+  .drop-num-badge span:first-child { font-size: 0.5rem; }
+  .drop-num-badge span:last-child { font-size: 1.4rem; }
+  .drop-pill { padding: 8px 14px; }
+  .drop-pill-text { font-size: 0.62rem; letter-spacing: 0.12em; }
+  .hero-dots { position: static; margin: 28px 24px 0; justify-content: flex-start; }
 
   #bespoke { grid-template-columns: 1fr; }
   .bespoke-visual { min-height: 360px; }
@@ -1069,11 +1082,21 @@ footer {
   .waitlist-row button { border-top: none; }
 }
 
+@media (max-width: 600px) {
+  /* Announcement bar: shrink to fit narrow viewports without ellipsis */
+  .announce-slide { padding: 0 44px 0 16px; justify-content: flex-start; gap: 10px; }
+  .announce-text { font-size: 0.62rem; letter-spacing: 0.1em; }
+  .announce-dots { right: 12px; gap: 4px; }
+  .announce-pip { width: 12px; }
+  .announce-slide .announce-dot:last-child { display: none; }   /* drop trailing dot for space */
+}
+
 @media (max-width: 480px) {
   .product-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .hero-actions { flex-direction: column; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions .btn-primary, .hero-actions .btn-ghost { text-align: center; }
+  .hero-drop-badge { margin-top: 28px; }
   .waitlist-row { flex-direction: column; }
   .waitlist-row input { border-right: 1px solid rgba(244,234,222,0.15); }
 }
