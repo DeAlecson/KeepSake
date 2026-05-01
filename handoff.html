@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude Code Handoff — Keepsake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --navy: #0F172A;
+  --gold: #C69B3C;
+  --ivory: #F4EADE;
+  --taupe: #8A7968;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0f1a; color: #c8d4e8; font-family: var(--font-body); font-size: 15px; line-height: 1.7; }
+
+.doc-wrap { max-width: 960px; margin: 0 auto; padding: 60px 40px 100px; }
+
+/* Header */
+.doc-header { border-bottom: 1px solid rgba(198,155,60,0.25); padding-bottom: 40px; margin-bottom: 56px; }
+.doc-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(198,155,60,0.1); border: 1px solid rgba(198,155,60,0.3); padding: 6px 14px; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-family: var(--font-body); margin-bottom: 24px; }
+.doc-title { font-family: var(--font-display); font-size: 3.2rem; font-weight: 300; color: var(--ivory); line-height: 1.1; margin-bottom: 12px; }
+.doc-title em { font-style: italic; color: var(--gold); }
+.doc-subtitle { color: rgba(200,212,232,0.55); font-size: 1rem; font-weight: 300; max-width: 600px; line-height: 1.7; }
+.doc-meta { display: flex; gap: 32px; margin-top: 28px; flex-wrap: wrap; }
+.doc-meta-item { display: flex; flex-direction: column; gap: 3px; }
+.doc-meta-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(200,212,232,0.35); }
+.doc-meta-value { font-size: 0.85rem; color: rgba(200,212,232,0.75); }
+
+/* Sections */
+.doc-section { margin-bottom: 60px; }
+.doc-section-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--ivory); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(244,234,222,0.07); display: flex; align-items: center; gap: 14px; }
+.doc-section-num { font-family: var(--font-display); font-size: 1rem; color: var(--gold); font-weight: 300; }
+
+/* TOC */
+.toc { background: rgba(198,155,60,0.04); border: 1px solid rgba(198,155,60,0.15); padding: 28px 32px; margin-bottom: 56px; }
+.toc-title { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; font-family: var(--font-body); }
+.toc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.toc-list a { color: rgba(200,212,232,0.6); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; display: flex; align-items: center; gap: 10px; }
+.toc-list a:hover { color: var(--gold); }
+.toc-list a::before { content: '→'; color: rgba(198,155,60,0.4); font-size: 0.75rem; }
+
+/* Cards */
+.card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); padding: 24px 28px; margin-bottom: 16px; }
+.card-title { font-size: 0.85rem; font-weight: 500; color: var(--ivory); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.card-body { font-size: 0.83rem; color: rgba(200,212,232,0.55); line-height: 1.7; }
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 2px; font-family: var(--font-body); }
+.tag-gold { background: rgba(198,155,60,0.15); color: var(--gold); border: 1px solid rgba(198,155,60,0.3); }
+.tag-green { background: rgba(60,160,80,0.15); color: #5acc7a; border: 1px solid rgba(60,160,80,0.3); }
+.tag-blue { background: rgba(60,120,200,0.15); color: #7ab0f5; border: 1px solid rgba(60,120,200,0.3); }
+.tag-red { background: rgba(200,60,60,0.15); color: #f58080; border: 1px solid rgba(200,60,60,0.3); }
+.tag-gray { background: rgba(200,212,232,0.06); color: rgba(200,212,232,0.5); border: 1px solid rgba(200,212,232,0.12); }
+
+/* Code blocks */
+pre { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); padding: 20px 24px; overflow-x: auto; margin: 16px 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.65; color: #a8c4e0; border-left: 3px solid var(--gold); }
+code { font-family: var(--font-mono); font-size: 0.82em; background: rgba(198,155,60,0.1); padding: 1px 5px; color: var(--gold); }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.83rem; }
+th { text-align: left; padding: 10px 16px; background: rgba(198,155,60,0.08); color: var(--gold); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; border-bottom: 1px solid rgba(198,155,60,0.2); }
+td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(200,212,232,0.65); vertical-align: top; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* List */
+ul.doc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0; }
+ul.doc-list li { padding-left: 20px; position: relative; font-size: 0.85rem; color: rgba(200,212,232,0.65); line-height: 1.6; }
+ul.doc-list li::before { content: '—'; position: absolute; left: 0; color: var(--gold); }
+
+/* Priority matrix */
+.priority-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.priority-card { padding: 20px; border: 1px solid; }
+.priority-card.p1 { border-color: rgba(245,128,128,0.35); background: rgba(245,128,128,0.04); }
+.priority-card.p2 { border-color: rgba(198,155,60,0.35); background: rgba(198,155,60,0.04); }
+.priority-card.p3 { border-color: rgba(122,176,245,0.35); background: rgba(122,176,245,0.04); }
+.priority-card.p4 { border-color: rgba(90,204,122,0.35); background: rgba(90,204,122,0.04); }
+.priority-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; font-family: var(--font-body); }
+.priority-card.p1 .priority-label { color: #f58080; }
+.priority-card.p2 .priority-label { color: var(--gold); }
+.priority-card.p3 .priority-label { color: #7ab0f5; }
+.priority-card.p4 .priority-label { color: #5acc7a; }
+.priority-items { display: flex; flex-direction: column; gap: 6px; }
+.priority-item { font-size: 0.8rem; color: rgba(200,212,232,0.6); display: flex; align-items: flex-start; gap: 8px; }
+.priority-item::before { content: '·'; color: rgba(200,212,232,0.3); flex-shrink: 0; }
+
+/* Palette swatches */
+.palette { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.swatch { display: flex; flex-direction: column; gap: 6px; }
+.swatch-color { width: 64px; height: 40px; border: 1px solid rgba(255,255,255,0.08); }
+.swatch-name { font-size: 0.65rem; color: rgba(200,212,232,0.5); font-family: var(--font-mono); }
+
+/* File tree */
+.file-tree { font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8; color: rgba(200,212,232,0.6); background: rgba(0,0,0,0.3); padding: 20px 24px; border: 1px solid rgba(255,255,255,0.05); }
+.file-tree .dir { color: var(--gold); }
+.file-tree .file { color: #a8c4e0; }
+.file-tree .comment { color: rgba(200,212,232,0.3); font-style: italic; }
+
+@media(max-width:640px) {
+  .doc-wrap { padding: 40px 20px 80px; }
+  .priority-grid { grid-template-columns: 1fr; }
+  .doc-title { font-size: 2.2rem; }
+}
+</style>
+</head>
+<body>
+<div class="doc-wrap">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-badge">🛠 Claude Code Handoff Document — v2</div>
+    <h1 class="doc-title">Keepsake —<br /><em>Engineering Spec</em></h1>
+    <p class="doc-subtitle">Design MVP v2 completed. This document outlines everything Claude Code needs to build the fully functional web application: tech stack, data models, API routes, component breakdown, and prioritised task list.</p>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><span class="doc-meta-label">Project</span><span class="doc-meta-value">Keepsake (keepsake.sg)</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Design status</span><span class="doc-meta-value">✅ MVP v2 HTML complete</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Handoff date</span><span class="doc-meta-value">May 2026</span></div>
+      <div class="doc-meta-item"><span class="doc-meta-label">Design system</span><span class="doc-meta-value">Eternal Bond Palette</span></div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s0">0. v2 Changelog</a></li>
+      <li><a href="#s1">1. Design Files Delivered</a></li>
+      <li><a href="#s2">2. Design System Tokens</a></li>
+      <li><a href="#s3">3. Tech Stack Recommendation</a></li>
+      <li><a href="#s4">4. Page & Route Map</a></li>
+      <li><a href="#s5">5. Data Models</a></li>
+      <li><a href="#s6">6. API Endpoints</a></li>
+      <li><a href="#s7">7. Component Breakdown</a></li>
+      <li><a href="#s8">8. Feature X — NFC / QR System</a></li>
+      <li><a href="#s9">9. Payments Integration</a></li>
+      <li><a href="#s10">10. Prioritised Build Order</a></li>
+      <li><a href="#s11">11. Open Questions for CNC Team</a></li>
+    </ul>
+  </div>
+
+  <!-- 0. CHANGELOG -->
+  <div class="doc-section" id="s0">
+    <h2 class="doc-section-title"><span class="doc-section-num">00</span> v2 Changelog</h2>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">New</span> Announcement Bar Carousel</div>
+      <div class="card-body">Fixed top bar (40px) above nav with auto-rotating messages. Two messages: (1) "Next Drop: 12 July 2026 — Join the waitlist" and (2) "Join our newsletter & receive 10% off your first order". Auto-rotates every 4 seconds with pip navigation. Nav position offset accordingly.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">New</span> Cart Icon + Cart Drawer</div>
+      <div class="card-body">Cart icon (bag SVG) added to nav right cluster with animated gold counter badge. Clicking opens a slide-in cart drawer from the right. Cart state persisted to <code>localStorage</code> as <code>ks_cart</code>. Items show puck visual, name, type, drop, price and remove button. Footer shows subtotal + "Proceed to Checkout" + "Add to Cart & Continue Shopping" buttons.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">New</span> Quick-Add on Product Cards</div>
+      <div class="card-body">Hovering a non-sold-out product card reveals a gold "Add to Cart" button that slides up from the bottom of the card image. Clicking adds to <code>localStorage</code> cart and opens the cart drawer. Sold-out items do not show this button.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">New</span> Logo Splash Animation</div>
+      <div class="card-body">Clicking the "Keepsake" wordmark in the nav triggers a full-screen navy overlay with an animated puck + expanding gold rings + wordmark fade-in. Lasts 1.2s then fades out and scrolls to top. Elegant brand moment for returning to home.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">New</span> Newsletter Section with 10% Off</div>
+      <div class="card-body">New full section above footer: two-column layout, "10% off" badge, email input with success state. Positioned between Feature X teaser and footer. Linked from announcement bar and mobile nav. Backend: <code>POST /api/newsletter</code> — store email, send discount code via Resend.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Fixed</span> Customize Flow — Cart Actions</div>
+      <div class="card-body">Step 4 (Review) previously had confusing "Add to Cart" + "Continue Shopping" as separate buttons. Replaced with: primary "Proceed to Checkout" + secondary "Add to Cart & Continue Shopping" (single action: saves to <code>localStorage</code> and redirects to <code>index.html#shop</code>).</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Fixed</span> Mobile Nav Drawer</div>
+      <div class="card-body">Drawer now uses <code>transform: translateX(100%)</code> instead of <code>right: -100%</code>, fixing a render bug where the drawer appeared open on load in some viewport contexts. Hamburger now morphs to X when active.</div>
+    </div>
+  </div>
+
+  <!-- 1. FILES -->
+  <div class="doc-section" id="s1">
+    <h2 class="doc-section-title"><span class="doc-section-num">01</span> Design Files Delivered</h2>
+    <div class="file-tree">
+      <div><span class="dir">keepsake-design/</span></div>
+      <div>&nbsp;&nbsp;├── <span class="file">index.html</span> &nbsp;&nbsp;<span class="comment">← Homepage: hero carousel, bespoke section, shop grid, Feature X teaser, footer</span></div>
+      <div>&nbsp;&nbsp;├── <span class="file">customize.html</span> &nbsp;&nbsp;<span class="comment">← Product 2 customizer: 6-step flow (template → addons → attachment → review → payment → instructions)</span></div>
+      <div>&nbsp;&nbsp;├── <span class="file">feature-x.html</span> &nbsp;&nbsp;<span class="comment">← NFC Pet Registry: hero, how-it-works, registration flow (4 tabs), community pet grid, modal</span></div>
+      <div>&nbsp;&nbsp;└── <span class="file">handoff.html</span> &nbsp;&nbsp;<span class="comment">← This document</span></div>
+    </div>
+    <p style="margin-top:16px;font-size:0.83rem;color:rgba(200,212,232,0.5);">All pages are fully responsive (mobile-first breakpoints at 820px). Navigation is wired between all three pages. Copy, placeholders, and interaction states are complete.</p>
+  </div>
+
+  <!-- 2. DESIGN SYSTEM -->
+  <div class="doc-section" id="s2">
+    <h2 class="doc-section-title"><span class="doc-section-num">02</span> Design System Tokens</h2>
+    <p style="font-size:0.85rem;color:rgba(200,212,232,0.55);margin-bottom:20px;">The "Eternal Bond" palette. Apply as CSS custom properties or Tailwind config values.</p>
+    <div class="palette">
+      <div class="swatch"><div class="swatch-color" style="background:#0F172A;"></div><div class="swatch-name">--navy<br/>#0F172A</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#C69B3C;"></div><div class="swatch-name">--gold<br/>#C69B3C</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#D4AF5A;"></div><div class="swatch-name">--gold-light<br/>#D4AF5A</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F4EADE;border-color:rgba(255,255,255,0.2);"></div><div class="swatch-name">--ivory<br/>#F4EADE</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#8A7968;"></div><div class="swatch-name">--taupe<br/>#8A7968</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#B0A090;"></div><div class="swatch-name">--taupe-light<br/>#B0A090</div></div>
+    </div>
+    <pre>/* CSS Variables — paste into globals.css */
+:root {
+  --navy:        #0F172A;
+  --gold:        #C69B3C;
+  --gold-light:  #D4AF5A;
+  --ivory:       #F4EADE;
+  --taupe:       #8A7968;
+  --taupe-light: #B0A090;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  /* Spacing scale (8px base) */
+  --space-xs:  8px;
+  --space-sm:  16px;
+  --space-md:  24px;
+  --space-lg:  48px;
+  --space-xl:  80px;
+  --space-2xl: 120px;
+}</pre>
+  </div>
+
+  <!-- 3. TECH STACK -->
+  <div class="doc-section" id="s3">
+    <h2 class="doc-section-title"><span class="doc-section-num">03</span> Tech Stack Recommendation</h2>
+    <table>
+      <thead><tr><th>Layer</th><th>Recommended</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td><code>Next.js 14</code> (App Router)</td><td>SSR for SEO on product pages; ISR for community grid; API routes for backend</td></tr>
+        <tr><td>Styling</td><td><code>Tailwind CSS</code> + CSS Modules for complex components</td><td>Fast to implement design tokens; purge keeps bundle small</td></tr>
+        <tr><td>Database</td><td><code>Supabase</code> (Postgres + Auth + Storage)</td><td>Auth for pet owners, storage for pet photos, RLS for edit-only-by-owner</td></tr>
+        <tr><td>Payments</td><td><code>Stripe</code> + Stripe Elements</td><td>Already referenced in design; supports Apple Pay, Google Pay, PayPal via Stripe</td></tr>
+        <tr><td>Email</td><td><code>Resend</code> + React Email templates</td><td>Waitlist confirmations, order updates, shipping notifications</td></tr>
+        <tr><td>NFC / QR</td><td><code>ntag.io</code> or custom NFC tag management</td><td>Each chip gets a unique UUID that resolves to the pet profile page</td></tr>
+        <tr><td>Image uploads</td><td><code>Supabase Storage</code> + <code>Cloudflare Images</code></td><td>Resize and serve optimised pet photos at CDN edge</td></tr>
+        <tr><td>State management</td><td><code>Zustand</code> (lightweight)</td><td>Multi-step customizer cart state; persisted to localStorage</td></tr>
+        <tr><td>Animations</td><td><code>Framer Motion</code></td><td>Page transitions, scroll reveals, hover states matching the luxury feel</td></tr>
+        <tr><td>Hosting</td><td><code>Vercel</code></td><td>Zero-config Next.js, edge functions, analytics</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ROUTES -->
+  <div class="doc-section" id="s4">
+    <h2 class="doc-section-title"><span class="doc-section-num">04</span> Page & Route Map</h2>
+    <table>
+      <thead><tr><th>Route</th><th>Page</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>Homepage</td><td><span class="tag tag-green">SSR</span></td><td>Hero carousel, bespoke section, product 1 shop grid, feature X teaser</td></tr>
+        <tr><td><code>/shop</code></td><td>Full Shop</td><td><span class="tag tag-green">SSR</span></td><td>Extended product 1 grid with filter sidebar; pagination</td></tr>
+        <tr><td><code>/shop/[slug]</code></td><td>Product Detail</td><td><span class="tag tag-green">SSR</span></td><td>Product 1 detail — photos, colour chips, sold-out state, drop number</td></tr>
+        <tr><td><code>/bespoke</code></td><td>Bespoke Landing</td><td><span class="tag tag-green">SSR</span></td><td>Marketing page for Product 2 with waitlist CTA</td></tr>
+        <tr><td><code>/bespoke/customize</code></td><td>Customizer</td><td><span class="tag tag-blue">CSR</span></td><td>6-step customizer flow (template, addons, attachment, review, payment, instructions)</td></tr>
+        <tr><td><code>/bespoke/customize/[orderId]</code></td><td>Unique Order Link</td><td><span class="tag tag-blue">CSR</span></td><td>Pre-authenticated link sent to waitlist users; loads their specific order context</td></tr>
+        <tr><td><code>/pets</code></td><td>Pet Registry</td><td><span class="tag tag-gold">ISR</span></td><td>Feature X landing + community grid (revalidate every 60s)</td></tr>
+        <tr><td><code>/pets/[petId]</code></td><td>Pet Profile</td><td><span class="tag tag-gold">ISR</span></td><td>Individual pet memorial page — accessed via NFC tap</td></tr>
+        <tr><td><code>/pets/register</code></td><td>Pet Registration</td><td><span class="tag tag-blue">CSR</span></td><td>4-step registration (verify QR, pet details, personalise, success)</td></tr>
+        <tr><td><code>/nfc/[chipId]</code></td><td>NFC Redirect</td><td><span class="tag tag-green">SSR</span></td><td>Server-side redirect: looks up chipId → petId → redirects to <code>/pets/[petId]</code></td></tr>
+        <tr><td><code>/order/[orderId]</code></td><td>Order Status</td><td><span class="tag tag-blue">CSR</span></td><td>Post-purchase order tracking page (email-linked)</td></tr>
+        <tr><td><code>/account</code></td><td>Account</td><td><span class="tag tag-blue">CSR</span></td><td>Order history, pet profile management, waitlist status</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. DATA MODELS -->
+  <div class="doc-section" id="s5">
+    <h2 class="doc-section-title"><span class="doc-section-num">05</span> Data Models</h2>
+    <pre>-- products (Product 1 — premade drops)
+CREATE TABLE products (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  slug        TEXT UNIQUE NOT NULL,
+  type        TEXT CHECK (type IN ('necklace', 'keychain')),
+  drop_num    INT NOT NULL,
+  price_sgd   NUMERIC(8,2) NOT NULL,
+  was_sgd     NUMERIC(8,2),
+  colors      TEXT[] NOT NULL,      -- hex array [c1, c2, c3]
+  sold_out    BOOLEAN DEFAULT false,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- waitlist
+CREATE TABLE waitlist (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       TEXT UNIQUE NOT NULL,
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  order_link  TEXT,                  -- unique link sent via email
+  link_sent   BOOLEAN DEFAULT false
+);
+
+-- bespoke_orders (Product 2)
+CREATE TABLE bespoke_orders (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_email      TEXT NOT NULL,
+  template        TEXT NOT NULL,     -- filled|heart|swirl|bundle|line|circle
+  addons          TEXT[],            -- ['gold','flowers'] etc.
+  attachment_key  TEXT NOT NULL,     -- stainless|string|silver-pl|rose-gold|gold-pl|keychain
+  attachment_price NUMERIC(6,2) DEFAULT 0,
+  total_sgd       NUMERIC(8,2) NOT NULL,
+  status          TEXT DEFAULT 'pending_hair',
+  -- pending_hair | hair_received | crafting | qa | shipped | delivered
+  stripe_payment_id TEXT,
+  nfc_chip_id     TEXT UNIQUE,       -- assigned after crafting
+  tracking_number TEXT,
+  created_at      TIMESTAMPTZ DEFAULT now(),
+  updated_at      TIMESTAMPTZ DEFAULT now()
+);
+
+-- pets (Feature X)
+CREATE TABLE pets (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id    UUID REFERENCES bespoke_orders(id),
+  owner_id    UUID REFERENCES auth.users(id),
+  nfc_chip_id TEXT UNIQUE NOT NULL,  -- links to bespoke_orders.nfc_chip_id
+  name        TEXT NOT NULL,
+  breed       TEXT NOT NULL,
+  photo_url   TEXT,
+  description TEXT,
+  thought     TEXT,                  -- "small message from pet"
+  social_url  TEXT,
+  is_public   BOOLEAN DEFAULT true,
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- nfc_chips (device management)
+CREATE TABLE nfc_chips (
+  chip_id     TEXT PRIMARY KEY,      -- physical chip UID
+  pet_id      UUID REFERENCES pets(id),
+  order_id    UUID REFERENCES bespoke_orders(id),
+  activated   BOOLEAN DEFAULT false,
+  activated_at TIMESTAMPTZ
+);</pre>
+  </div>
+
+  <!-- 6. API ENDPOINTS -->
+  <div class="doc-section" id="s6">
+    <h2 class="doc-section-title"><span class="doc-section-num">06</span> API Endpoints</h2>
+    <table>
+      <thead><tr><th>Method</th><th>Route</th><th>Auth</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/waitlist</code></td><td>None</td><td>Add email to waitlist; send confirmation email via Resend</td></tr>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/newsletter</code></td><td>None</td><td>Subscribe email to newsletter; send 10% off discount code via Resend; store in <code>newsletter_subscribers</code> table</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/products</code></td><td>None</td><td>List Product 1 items; supports <code>?type=</code> & <code>?drop=</code> filters</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/products/[slug]</code></td><td>None</td><td>Single product detail</td></tr>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/orders/bespoke</code></td><td>Email token</td><td>Create bespoke order from customizer; returns Stripe PaymentIntent</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/orders/[id]</code></td><td>Owner</td><td>Get order status and tracking info</td></tr>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/nfc/verify</code></td><td>None</td><td>Verify NFC chip UID + box QR code; returns ownership token</td></tr>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/pets</code></td><td>NFC token</td><td>Create pet profile after NFC verification</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/pets</code></td><td>None</td><td>List public pets for community grid; supports pagination</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/pets/[id]</code></td><td>None</td><td>Get individual pet profile</td></tr>
+        <tr><td><span class="tag tag-gold">PATCH</span></td><td><code>/api/pets/[id]</code></td><td>Owner QR</td><td>Update pet profile (name, photo, thought, socials)</td></tr>
+        <tr><td><span class="tag tag-blue">GET</span></td><td><code>/api/nfc/[chipId]</code></td><td>None</td><td>Resolve chip → pet profile URL (used by NFC redirect page)</td></tr>
+        <tr><td><span class="tag tag-green">POST</span></td><td><code>/api/stripe/webhook</code></td><td>Stripe sig</td><td>Handle payment success → update order status → send confirmation email</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. COMPONENTS -->
+  <div class="doc-section" id="s7">
+    <h2 class="doc-section-title"><span class="doc-section-num">07</span> Component Breakdown</h2>
+    <p style="font-size:0.83rem;color:rgba(200,212,232,0.5);margin-bottom:20px;">Components to build, referencing the HTML design files as visual spec.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">Layout</span> Navigation</div>
+      <div class="card-body">Fixed top nav with logo, links, CTA button, mobile hamburger + drawer. Scroll-activated dark frosted glass effect. Reference: <code>index.html nav</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gold">Layout</span> Hero Carousel</div>
+      <div class="card-body">Auto-advancing 3-slide carousel with dot navigation, animated text entry, floating drop badge (#16), and CTA buttons. Replace placeholder slides with real photography. Reference: <code>index.html #hero</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-blue">Product</span> ProductCard (P1)</div>
+      <div class="card-body">Grid card with resin puck visual, name, type badge, price with strikethrough, sold-out overlay, drop number tag. Fetches from <code>/api/products</code>. Filter by type/drop/price. Reference: <code>index.html .product-grid</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-blue">Product</span> BespokeSection</div>
+      <div class="card-body">Full-width split panel: animated NFC puck illustration left, content + waitlist form right. Form calls <code>POST /api/waitlist</code> with success state. Reference: <code>index.html #bespoke</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Customizer</span> CustomizerFlow (6 steps)</div>
+      <div class="card-body">Multi-step form with persistent state (Zustand), live price calculator, sticky preview panel. Steps: Template → Addons → Attachment → Review → Payment (Stripe Elements) → Success. Reference: <code>customize.html</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Feature X</span> PetRegistrationFlow (4 steps)</div>
+      <div class="card-body">QR verify + NFC tap simulation → Pet details form → Personalise (thought, social) → Success. NFC verification calls <code>POST /api/nfc/verify</code>. Photo upload to Supabase Storage. Reference: <code>feature-x.html #reg-section</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Feature X</span> PetGrid + PetCard + PetModal</div>
+      <div class="card-body">Masonry/grid of PetCards fetched from <code>/api/pets</code>. Infinite scroll or load-more pagination. Click opens modal with full pet profile. Reference: <code>feature-x.html #community</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-green">Feature X</span> PetProfilePage <code>/pets/[petId]</code></div>
+      <div class="card-body">Full-page pet memorial: large hero photo, name, breed, thought quote, description, social links, "meet the community" section below. Accessible via NFC tap redirect from <code>/nfc/[chipId]</code>.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="tag tag-gray">Shared</span> WaitlistForm, PriceBreakdown, StepProgress, FilterBar, Footer</div>
+      <div class="card-body">Reusable across pages. WaitlistForm handles email validation + API call + success state. StepProgress renders numbered steps with done/active states. FilterBar manages product type + price sort.</div>
+    </div>
+  </div>
+
+  <!-- 8. FEATURE X -->
+  <div class="doc-section" id="s8">
+    <h2 class="doc-section-title"><span class="doc-section-num">08</span> Feature X — NFC / QR System</h2>
+    <div class="card">
+      <div class="card-title">NFC Chip Lifecycle</div>
+      <div class="card-body">
+        <ol style="padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:0.83rem;color:rgba(200,212,232,0.55);line-height:1.6;">
+          <li>During production, each bespoke keepsake is assigned a unique <code>chip_id</code> (NFC UID) programmed onto an NTAG215 or similar chip embedded in the resin.</li>
+          <li>The chip is pre-programmed to redirect to <code>https://keepsake.sg/nfc/{chip_id}</code>.</li>
+          <li>A QR code with the same destination is printed and placed in the box. The QR also encodes an owner secret: <code>/nfc/{chip_id}?secret={ownerToken}</code>.</li>
+          <li>Registration flow: user scans QR (gets owner token) → taps NFC → <code>POST /api/nfc/verify</code> with both chip_id and ownerToken → backend confirms match → returns a session JWT for pet creation.</li>
+          <li>Once registered, visiting <code>/nfc/{chip_id}</code> (without secret) redirects to the pet's public profile page <code>/pets/{petId}</code>.</li>
+          <li>Only the original QR secret holder can update the profile (<code>PATCH /api/pets/{id}</code> requires the owner JWT).</li>
+        </ol>
+      </div>
+    </div>
+    <pre>// NFC redirect route: /nfc/[chipId]/page.tsx
+export async function GET(req, { params }) {
+  const { chipId } = params;
+  const secret = new URL(req.url).searchParams.get('secret');
+
+  const chip = await db.nfc_chips.findUnique({ where: { chip_id: chipId } });
+  if (!chip) return notFound();
+
+  // If secret present → registration flow
+  if (secret && chip.owner_secret === secret) {
+    return redirect(`/pets/register?chip=${chipId}&token=${secret}`);
+  }
+
+  // Public tap → pet profile
+  if (chip.pet_id) return redirect(`/pets/${chip.pet_id}`);
+
+  // Unregistered chip
+  return redirect('/pets/register?chip=' + chipId);
+}</pre>
+  </div>
+
+  <!-- 9. PAYMENTS -->
+  <div class="doc-section" id="s9">
+    <h2 class="doc-section-title"><span class="doc-section-num">09</span> Payments Integration</h2>
+    <pre>// Bespoke order payment flow
+// 1. Client calls POST /api/orders/bespoke → creates order + PaymentIntent
+// 2. Client uses Stripe Elements to collect card / Apple Pay / Google Pay
+// 3. On payment success, Stripe webhook fires → update order.status = 'pending_hair'
+// 4. Send email to customer with studio mailing address + order reference
+// 5. Admin panel (future) marks hair_received → crafting → qa → shipped
+
+// Pricing logic (server-side — never trust client)
+const BASE_PRICE = 150_00; // cents SGD
+const ADDON_PRICES = { gold: 30_00, silver: 10_00, flowers: 15_00 };
+const ATTACHMENT_PRICES = {
+  stainless: 0, string: 0,
+  'silver-pl': 20_00, 'rose-gold': 30_00, 'gold-pl': 30_00,
+  keychain: 0
+};
+
+function calcTotal(addons, attachment) {
+  return BASE_PRICE
+    + addons.reduce((s, a) => s + (ADDON_PRICES[a] ?? 0), 0)
+    + (ATTACHMENT_PRICES[attachment] ?? 0);
+}</pre>
+    <p style="font-size:0.82rem;color:rgba(200,212,232,0.45);margin-top:12px;">Product 1 (premade drops) pricing: $35 SGD fixed. These are simple Stripe Checkout sessions, no customization needed.</p>
+  </div>
+
+  <!-- 10. PRIORITY -->
+  <div class="doc-section" id="s10">
+    <h2 class="doc-section-title"><span class="doc-section-num">10</span> Prioritised Build Order</h2>
+    <div class="priority-grid">
+      <div class="priority-card p1">
+        <div class="priority-label">🔴 P1 — Ship First</div>
+        <div class="priority-items">
+          <div class="priority-item">Next.js project scaffold + Tailwind + CSS tokens</div>
+          <div class="priority-item">Supabase setup (auth, tables, storage)</div>
+          <div class="priority-item">Homepage (hero, bespoke section, shop grid, footer)</div>
+          <div class="priority-item">Waitlist email capture → Resend confirmation</div>
+          <div class="priority-item">Product 1 shop grid + filter (static product data OK for now)</div>
+          <div class="priority-item">Bespoke customizer flow (full 6-step, Stripe payment)</div>
+          <div class="priority-item">Order confirmation email with studio address</div>
+        </div>
+      </div>
+      <div class="priority-card p2">
+        <div class="priority-label">🟡 P2 — Launch Week</div>
+        <div class="priority-items">
+          <div class="priority-item">Feature X: Pet registration flow (QR + NFC verify)</div>
+          <div class="priority-item">Pet profile pages (<code>/pets/[id]</code>)</div>
+          <div class="priority-item">NFC redirect routing (<code>/nfc/[chipId]</code>)</div>
+          <div class="priority-item">Community pet grid with pagination</div>
+          <div class="priority-item">Order status page + email updates</div>
+          <div class="priority-item">Admin: mark order status transitions</div>
+        </div>
+      </div>
+      <div class="priority-card p3">
+        <div class="priority-label">🔵 P3 — Post-Launch</div>
+        <div class="priority-items">
+          <div class="priority-item">Full product detail pages for Product 1</div>
+          <div class="priority-item">Account portal (order history, edit pet profile)</div>
+          <div class="priority-item">Drop notification sign-up (separate from waitlist)</div>
+          <div class="priority-item">Stripe Checkout for Product 1 (cart)</div>
+          <div class="priority-item">SEO metadata + OG images for pet profiles</div>
+          <div class="priority-item">Analytics (Vercel Analytics + custom events)</div>
+        </div>
+      </div>
+      <div class="priority-card p4">
+        <div class="priority-label">🟢 P4 — Future</div>
+        <div class="priority-items">
+          <div class="priority-item">Pet profile guestbook / reactions</div>
+          <div class="priority-item">Anniversary notifications via email</div>
+          <div class="priority-item">Product 1 CMS (admin drops management)</div>
+          <div class="priority-item">Bespoke order photo progress updates</div>
+          <div class="priority-item">Keepsake care guide + educational content pages</div>
+          <div class="priority-item">Referral / loyalty program</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. OPEN QUESTIONS -->
+  <div class="doc-section" id="s11">
+    <h2 class="doc-section-title"><span class="doc-section-num">11</span> Open Questions for CNC Team</h2>
+    <ul class="doc-list">
+      <li><strong>Studio address:</strong> Placeholder used in design — provide real mailing address for the "send your pet's hair" step and order confirmation email.</li>
+      <li><strong>NFC chip supplier:</strong> Which NTAG type? Who programs the chips? We need the UID format to design the <code>chip_id</code> schema correctly.</li>
+      <li><strong>Box QR code production:</strong> Who prints the box inserts? The QR needs to encode the owner secret URL — needs coordination with fulfilment.</li>
+      <li><strong>Product 1 photos:</strong> Hero carousel and all 10 necklace / 5 keychain product images are placeholder — provide final photography before launch.</li>
+      <li><strong>Drop cadence:</strong> How often do drops happen? Does the site need an admin panel to publish new drops, or will it be manually updated in the DB?</li>
+      <li><strong>SGD pricing confirmed:</strong> $35 (was $49) for Product 1. $150 base for Product 2 (confirm final). Are prices inclusive of GST?</li>
+      <li><strong>PayPal:</strong> Stripe supports PayPal via the "Pay with PayPal" button in Stripe Checkout — confirm if this is the preferred integration or direct PayPal SDK.</li>
+      <li><strong>Shipping rates:</strong> International shipping? Flat rate, weight-based, or carrier-calculated? Required for Stripe checkout shipping step.</li>
+      <li><strong>Pet profile ownership:</strong> If a customer loses their box (with QR code), how do they recover edit access? Need an account recovery flow.</li>
+      <li><strong>Domain:</strong> Is <code>keepsake.sg</code> confirmed? The <code>/nfc/</code> redirect URL is baked into every NFC chip — must be decided before chip programming.</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:60px;padding:32px;background:rgba(198,155,60,0.06);border:1px solid rgba(198,155,60,0.2);text-align:center;">
+    <div style="font-family:var(--font-display);font-size:1.4rem;color:var(--ivory);margin-bottom:8px;">Ready to build.</div>
+    <div style="font-size:0.83rem;color:rgba(200,212,232,0.45);max-width:480px;margin:0 auto;line-height:1.7;">The three design HTML files above serve as pixel-perfect visual spec. Claude Code should reference them for all component styling, copy, layout, and interaction patterns. Start with P1 priorities and iterate.</div>
+  </div>
+
+</div>
+</body>
+</html>

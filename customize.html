@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Customise Your Keepsake — Bespoke Pet Memorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --navy: #0F172A;
+  --gold: #C69B3C;
+  --gold-light: #D4AF5A;
+  --ivory: #F4EADE;
+  --taupe: #8A7968;
+  --taupe-light: #B0A090;
+  --white: #FDFAF6;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--ivory); color: var(--navy); font-family: var(--font-body); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+
+/* ── TOP NAV ── */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 40px;
+}
+.top-bar-logo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; color: var(--ivory); letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; }
+.top-bar-back { color: rgba(244,234,222,0.55); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+.top-bar-back:hover { color: var(--gold); }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap {
+  position: fixed; top: 58px; left: 0; right: 0; z-index: 99;
+  background: var(--navy); padding: 0 40px 14px;
+  border-bottom: 1px solid rgba(198,155,60,0.15);
+}
+.progress-steps { display: flex; gap: 0; align-items: center; }
+.prog-step {
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  padding: 6px 0;
+  position: relative;
+}
+.prog-step:not(:last-child)::after {
+  content: '';
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 18px;
+  background: rgba(244,234,222,0.12);
+}
+.prog-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid rgba(244,234,222,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: rgba(244,234,222,0.35);
+  font-family: var(--font-body); flex-shrink: 0;
+  transition: all 0.3s;
+}
+.prog-step.active .prog-num, .prog-step.done .prog-num {
+  background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600;
+}
+.prog-step.done .prog-num::after { content: '✓'; font-size: 0.6rem; }
+.prog-step.done .prog-num { font-size: 0; }
+.prog-step.done .prog-num::after { font-size: 0.65rem; }
+.prog-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(244,234,222,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-step.active .prog-label { color: var(--gold); }
+
+/* ── LAYOUT ── */
+.page { padding-top: 120px; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Each step panel */
+.step-panel {
+  display: none; flex: 1;
+  max-width: 1200px; margin: 0 auto; width: 100%;
+  padding: 40px 40px 120px;
+}
+.step-panel.active { display: flex; flex-direction: column; }
+
+.step-header { margin-bottom: 48px; }
+.step-eyebrow {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.step-eyebrow-line { width: 32px; height: 1px; background: var(--gold); }
+.step-eyebrow-text { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-family: var(--font-body); }
+.step-title { font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 300; color: var(--navy); line-height: 1.1; }
+.step-title em { font-style: italic; color: var(--taupe); }
+.step-desc { margin-top: 12px; font-size: 0.9rem; color: var(--taupe); max-width: 520px; line-height: 1.7; font-weight: 300; }
+
+/* Two-col with sticky preview */
+.step-body { display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: start; }
+
+/* Preview panel */
+.preview-panel {
+  position: sticky; top: 140px;
+  background: var(--navy);
+  padding: 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+.preview-puck {
+  width: 160px; height: 120px; border-radius: 50%;
+  background: radial-gradient(ellipse at 38% 32%,
+    rgba(198,155,60,0.6) 0%, rgba(138,121,104,0.5) 40%, rgba(15,23,42,0.9) 80%);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.08);
+  position: relative; transition: all 0.5s ease;
+}
+.preview-puck .hair-overlay {
+  position: absolute; inset: 8px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+  transition: all 0.4s;
+}
+.preview-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(244,234,222,0.4); font-family: var(--font-body); }
+.preview-price-breakdown { width: 100%; }
+.preview-price-breakdown h4 { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-family: var(--font-body); }
+.price-line { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(244,234,222,0.06); font-size: 0.82rem; color: rgba(244,234,222,0.6); }
+.price-line:last-child { border-bottom: none; }
+.price-line.total { color: var(--ivory); font-weight: 500; padding-top: 14px; }
+.price-line.total span:last-child { color: var(--gold); font-family: var(--font-display); font-size: 1.3rem; }
+
+/* ── TEMPLATE GRID ── */
+.template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.template-card {
+  border: 1.5px solid transparent;
+  background: var(--white);
+  padding: 20px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.template-card:hover { border-color: rgba(198,155,60,0.4); }
+.template-card.selected { border-color: var(--gold); background: rgba(198,155,60,0.05); }
+.template-icon { font-size: 2.2rem; line-height: 1; }
+.template-name { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); font-family: var(--font-body); font-weight: 500; }
+.template-desc { font-size: 0.72rem; color: var(--taupe); line-height: 1.5; }
+
+/* ── ADD-ONS ── */
+.addon-grid { display: flex; flex-direction: column; gap: 12px; }
+.addon-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--white);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 16px;
+}
+.addon-row:hover { border-color: rgba(198,155,60,0.3); }
+.addon-row.selected { border-color: var(--gold); background: rgba(198,155,60,0.04); }
+.addon-check {
+  width: 20px; height: 20px;
+  border: 1.5px solid rgba(138,121,104,0.4);
+  border-radius: 3px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; font-size: 0.7rem; color: transparent;
+}
+.addon-row.selected .addon-check { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.addon-info { flex: 1; }
+.addon-name { font-size: 0.88rem; font-weight: 500; color: var(--navy); margin-bottom: 2px; }
+.addon-desc { font-size: 0.75rem; color: var(--taupe); }
+.addon-price { font-family: var(--font-display); font-size: 1.1rem; color: var(--navy); flex-shrink: 0; }
+
+/* ── ATTACHMENT SELECTOR ── */
+.attachment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.attachment-card {
+  border: 1.5px solid transparent;
+  background: var(--white);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.attachment-card:hover { border-color: rgba(198,155,60,0.35); }
+.attachment-card.selected { border-color: var(--gold); background: rgba(198,155,60,0.04); }
+.attachment-card-top { display: flex; justify-content: space-between; align-items: center; }
+.attachment-name { font-size: 0.88rem; font-weight: 500; color: var(--navy); }
+.attachment-price { font-family: var(--font-display); font-size: 1rem; color: var(--taupe); }
+.attachment-price.free { color: var(--taupe-light); font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.1em; }
+.attachment-sub { font-size: 0.72rem; color: var(--taupe); }
+.attachment-radio { width: 16px; height: 16px; border: 1.5px solid rgba(138,121,104,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+.attachment-card.selected .attachment-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); display: block; }
+
+/* ── CART / CHECKOUT ── */
+.cart-actions { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--gold); color: var(--navy);
+  padding: 15px 36px; font-size: 0.78rem; letter-spacing: 0.16em;
+  text-transform: uppercase; font-weight: 500; font-family: var(--font-body);
+  border: none; cursor: pointer; transition: background 0.2s, transform 0.2s;
+  display: inline-block; text-decoration: none;
+}
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-ghost {
+  border: 1px solid rgba(138,121,104,0.4); color: var(--taupe);
+  padding: 15px 36px; font-size: 0.78rem; letter-spacing: 0.16em;
+  text-transform: uppercase; font-weight: 400; font-family: var(--font-body);
+  background: transparent; cursor: pointer; transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+.btn-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 0; border-top: 1px solid rgba(138,121,104,0.15); margin-top: 40px;
+}
+
+/* ── CHECKOUT ── */
+.checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: start; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.form-label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--taupe); font-family: var(--font-body); }
+.form-input {
+  padding: 13px 16px;
+  border: 1px solid rgba(138,121,104,0.3);
+  background: var(--white);
+  color: var(--navy);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--gold); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.payment-methods { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+.pay-btn {
+  flex: 1; min-width: 120px;
+  border: 1.5px solid transparent;
+  background: var(--white); padding: 14px 16px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; font-family: var(--font-body); font-size: 0.82rem;
+  color: var(--navy); transition: all 0.2s; font-weight: 500;
+}
+.pay-btn:hover, .pay-btn.selected { border-color: var(--gold); background: rgba(198,155,60,0.04); }
+
+/* ── ORDER SUMMARY ── */
+.order-summary { background: var(--navy); padding: 32px; position: sticky; top: 140px; }
+.order-summary h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 300; color: var(--ivory); margin-bottom: 24px; }
+.order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(244,234,222,0.07); font-size: 0.83rem; color: rgba(244,234,222,0.65); }
+.order-item:last-of-type { border-bottom: none; }
+.order-total { display: flex; justify-content: space-between; padding: 16px 0 0; margin-top: 4px; border-top: 1px solid rgba(198,155,60,0.25); }
+.order-total span:first-child { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(244,234,222,0.5); }
+.order-total span:last-child { font-family: var(--font-display); font-size: 1.4rem; color: var(--gold); }
+
+/* ── SUCCESS SCREEN ── */
+.success-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; gap: 24px; }
+.success-circle { width: 100px; height: 100px; border-radius: 50%; border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; position: relative; }
+.success-circle::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 1px solid rgba(198,155,60,0.2); }
+.success-check { font-size: 2.2rem; }
+.success-title { font-family: var(--font-display); font-size: clamp(2rem,5vw,3rem); font-weight: 300; color: var(--navy); }
+.success-title em { font-style: italic; color: var(--taupe); }
+.success-body { font-size: 0.9rem; color: var(--taupe); max-width: 460px; line-height: 1.75; font-weight: 300; }
+.address-box { background: var(--navy); color: var(--ivory); padding: 28px 36px; text-align: left; max-width: 360px; width: 100%; }
+.address-box-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; font-family: var(--font-body); }
+.address-box p { font-size: 0.88rem; color: rgba(244,234,222,0.7); line-height: 1.8; }
+
+/* ── INSTRUCTION STEPS ── */
+.instruction-steps { display: flex; flex-direction: column; gap: 0; max-width: 460px; width: 100%; }
+.instruction-step { display: flex; gap: 20px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid rgba(138,121,104,0.15); }
+.instruction-step:last-child { border-bottom: none; }
+.ins-num { font-family: var(--font-display); font-size: 1.3rem; color: var(--gold); font-weight: 400; flex-shrink: 0; min-width: 24px; line-height: 1.2; }
+.ins-text { font-size: 0.85rem; color: var(--taupe); line-height: 1.6; }
+.ins-text strong { display: block; color: var(--navy); font-weight: 500; margin-bottom: 2px; }
+
+/* ── MOBILE ── */
+@media (max-width: 820px) {
+  .step-body { grid-template-columns: 1fr; }
+  .preview-panel { position: static; }
+  .checkout-grid { grid-template-columns: 1fr; }
+  .order-summary { position: static; }
+  .template-grid { grid-template-columns: repeat(2, 1fr); }
+  .attachment-grid { grid-template-columns: 1fr; }
+  .top-bar, .progress-wrap { padding-left: 20px; padding-right: 20px; }
+  .step-panel { padding: 32px 20px 100px; }
+  .form-row { grid-template-columns: 1fr; }
+  .progress-wrap { overflow-x: auto; }
+  .progress-steps { gap: 0; min-width: 560px; }
+  .prog-label { font-size: 0.55rem; }
+  .prog-step { flex-direction: column; align-items: center; gap: 4px; }
+  .prog-step::after { display: none; }
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.step-panel.active { animation: fadeIn 0.4s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="index.html" class="top-bar-logo">Keepsake</a>
+  <a href="index.html" class="top-bar-back">← Back to Home</a>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progress-steps">
+    <div class="prog-step active" data-step="1">
+      <div class="prog-num">1</div>
+      <span class="prog-label">Template</span>
+    </div>
+    <div class="prog-step" data-step="2">
+      <div class="prog-num">2</div>
+      <span class="prog-label">Add-ons</span>
+    </div>
+    <div class="prog-step" data-step="3">
+      <div class="prog-num">3</div>
+      <span class="prog-label">Attachment</span>
+    </div>
+    <div class="prog-step" data-step="4">
+      <div class="prog-num">4</div>
+      <span class="prog-label">Review</span>
+    </div>
+    <div class="prog-step" data-step="5">
+      <div class="prog-num">5</div>
+      <span class="prog-label">Payment</span>
+    </div>
+    <div class="prog-step" data-step="6">
+      <div class="prog-num">6</div>
+      <span class="prog-label">Instructions</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ════ STEP 1: TEMPLATE ════ -->
+<div class="step-panel active" id="step-1">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Step 1 of 6</span></div>
+    <h1 class="step-title">Choose your<br /><em>hair formation</em></h1>
+    <p class="step-desc">Each template places your pet's hair in a different formation within the resin. This is part of your base price.</p>
+  </div>
+
+  <div class="step-body">
+    <div>
+      <div class="template-grid" id="template-grid">
+        <div class="template-card selected" data-template="filled" data-emoji="🟤">
+          <div class="template-icon">⬤</div>
+          <div class="template-name">Filled</div>
+          <div class="template-desc">Hair distributed evenly across the entire piece</div>
+        </div>
+        <div class="template-card" data-template="heart" data-emoji="❤️">
+          <div class="template-icon">♥</div>
+          <div class="template-name">Heart</div>
+          <div class="template-desc">Hair arranged in the shape of a heart</div>
+        </div>
+        <div class="template-card" data-template="swirl" data-emoji="🌀">
+          <div class="template-icon">◉</div>
+          <div class="template-name">Swirl</div>
+          <div class="template-desc">Hair swept in a flowing spiral pattern</div>
+        </div>
+        <div class="template-card" data-template="bundle" data-emoji="🎋">
+          <div class="template-icon">≡</div>
+          <div class="template-name">Neat Bundle</div>
+          <div class="template-desc">Hair neatly bundled in the centre</div>
+        </div>
+        <div class="template-card" data-template="line" data-emoji="〰️">
+          <div class="template-icon">—</div>
+          <div class="template-name">Line</div>
+          <div class="template-desc">A single clean strand across the face</div>
+        </div>
+        <div class="template-card" data-template="circle" data-emoji="◯">
+          <div class="template-icon">○</div>
+          <div class="template-name">Circle</div>
+          <div class="template-desc">Hair arranged in a circular ring formation</div>
+        </div>
+      </div>
+      <div class="btn-nav">
+        <span style="font-size:0.78rem;color:var(--taupe);">Base price: <strong style="color:var(--navy);font-family:var(--font-display);font-size:1rem;">SGD $150</strong></span>
+        <button class="btn-primary" onclick="goToStep(2)">Continue — Add-ons →</button>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-panel">
+      <div class="preview-puck" id="preview-puck">
+        <div class="hair-overlay" id="hair-overlay">⬤</div>
+      </div>
+      <span class="preview-label">Live preview</span>
+      <div class="preview-price-breakdown">
+        <h4>Your order</h4>
+        <div class="price-line"><span>Base price</span><span>SGD $150</span></div>
+        <div class="price-line" id="addon-summary-line" style="display:none;"><span>Add-ons</span><span id="addon-total-disp">—</span></div>
+        <div class="price-line" id="attach-summary-line" style="display:none;"><span>Attachment</span><span id="attach-total-disp">—</span></div>
+        <div class="price-line total"><span>Total</span><span id="grand-total">SGD $150</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STEP 2: ADD-ONS ════ -->
+<div class="step-panel" id="step-2">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Step 2 of 6</span></div>
+    <h1 class="step-title">Optional<br /><em>embellishments</em></h1>
+    <p class="step-desc">Elevate your piece with carefully selected additions. Each is handset within the resin before curing.</p>
+  </div>
+
+  <div class="step-body">
+    <div>
+      <div class="addon-grid">
+        <div class="addon-row" data-addon="gold" data-price="30">
+          <div class="addon-check">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">Gold Flakes</div>
+            <div class="addon-desc">24K gold leaf flakes suspended within the resin</div>
+          </div>
+          <div class="addon-price">+ SGD $30</div>
+        </div>
+        <div class="addon-row" data-addon="silver" data-price="10">
+          <div class="addon-check">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">Silver Flakes</div>
+            <div class="addon-desc">Fine silver leaf for a cool metallic shimmer</div>
+          </div>
+          <div class="addon-price">+ SGD $10</div>
+        </div>
+        <div class="addon-row" data-addon="flowers" data-price="15">
+          <div class="addon-check">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">Pressed Flowers</div>
+            <div class="addon-desc">Delicate dried botanicals set alongside the hair</div>
+          </div>
+          <div class="addon-price">+ SGD $15</div>
+        </div>
+      </div>
+      <div class="btn-nav">
+        <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+        <button class="btn-primary" onclick="goToStep(3)">Continue — Attachment →</button>
+      </div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-puck" id="preview-puck-2">
+        <div class="hair-overlay" id="hair-overlay-2"></div>
+      </div>
+      <span class="preview-label">Live preview</span>
+      <div class="preview-price-breakdown">
+        <h4>Your order</h4>
+        <div class="price-line"><span>Base price</span><span>SGD $150</span></div>
+        <div class="price-line" id="addon-summary-line2" style="display:none;"><span>Add-ons</span><span id="addon-total-disp2">—</span></div>
+        <div class="price-line total"><span>Total so far</span><span id="grand-total-2">SGD $150</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STEP 3: ATTACHMENT ════ -->
+<div class="step-panel" id="step-3">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Step 3 of 6</span></div>
+    <h1 class="step-title">Choose your<br /><em>attachment</em></h1>
+    <p class="step-desc">Your keepsake comes with your chosen attachment included. Standard steel and string are always free.</p>
+  </div>
+
+  <div class="step-body">
+    <div>
+      <p style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--taupe);margin-bottom:16px;">Necklace</p>
+      <div class="attachment-grid" style="margin-bottom:28px;">
+        <div class="attachment-card selected" data-attach="stainless" data-price="0" data-label="Necklace — Stainless Steel">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Stainless Steel</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price free">FREE</span>
+          <span class="attachment-sub">Durable everyday chain, silver tone</span>
+        </div>
+        <div class="attachment-card" data-attach="string" data-price="0" data-label="Necklace — String">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Wax String</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price free">FREE</span>
+          <span class="attachment-sub">Minimalist waxed cord, adjustable length</span>
+        </div>
+        <div class="attachment-card" data-attach="silver-pl" data-price="20" data-label="Necklace — Silver Plated">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Silver Plated</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price">+ SGD $20</span>
+          <span class="attachment-sub">Sterling silver–plated fine chain</span>
+        </div>
+        <div class="attachment-card" data-attach="rose-gold" data-price="30" data-label="Necklace — Rose Gold Plated">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Rose Gold Plated</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price">+ SGD $30</span>
+          <span class="attachment-sub">Warm rose gold–plated chain</span>
+        </div>
+        <div class="attachment-card" data-attach="gold-pl" data-price="30" data-label="Necklace — Gold Plated">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Gold Plated</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price">+ SGD $30</span>
+          <span class="attachment-sub">24K gold–plated fine chain</span>
+        </div>
+      </div>
+
+      <p style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--taupe);margin-bottom:16px;">Keychain</p>
+      <div class="attachment-grid">
+        <div class="attachment-card" data-attach="keychain" data-price="0" data-label="Keychain — Standard">
+          <div class="attachment-card-top">
+            <span class="attachment-name">Standard Keychain</span>
+            <div class="attachment-radio"></div>
+          </div>
+          <span class="attachment-price free">FREE</span>
+          <span class="attachment-sub">Sturdy split ring with lobster clasp</span>
+        </div>
+      </div>
+
+      <div class="btn-nav">
+        <button class="btn-ghost" onclick="goToStep(2)">← Back</button>
+        <button class="btn-primary" onclick="goToStep(4)">Continue — Review →</button>
+      </div>
+    </div>
+
+    <div class="preview-panel">
+      <div class="preview-puck">
+        <div class="hair-overlay" id="hair-overlay-3"></div>
+      </div>
+      <span class="preview-label">Live preview</span>
+      <div class="preview-price-breakdown">
+        <h4>Your order</h4>
+        <div class="price-line"><span>Base price</span><span>SGD $150</span></div>
+        <div class="price-line" id="addon-summary-line3" style="display:none;"><span>Add-ons</span><span id="addon-total-disp3">—</span></div>
+        <div class="price-line" id="attach-summary-line3" style="display:none;"><span>Attachment</span><span id="attach-total-disp3">—</span></div>
+        <div class="price-line total"><span>Total so far</span><span id="grand-total-3">SGD $150</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STEP 4: REVIEW ════ -->
+<div class="step-panel" id="step-4">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Step 4 of 6</span></div>
+    <h1 class="step-title">Review your<br /><em>keepsake</em></h1>
+    <p class="step-desc">Everything looks good? Add it to cart, continue shopping, or proceed to checkout.</p>
+  </div>
+
+  <div class="step-body">
+    <div>
+      <div style="background:var(--white);padding:32px;display:flex;flex-direction:column;gap:16px;" id="review-summary">
+        <!-- populated by JS -->
+      </div>
+      <div class="cart-actions">
+        <button class="btn-primary" onclick="goToStep(5)" style="flex:1;">Proceed to Checkout</button>
+        <button class="btn-ghost" onclick="addToCartAndContinue()">Add to Cart &amp; Continue Shopping</button>
+      </div>
+      <div class="btn-nav">
+        <button class="btn-ghost" onclick="goToStep(3)">← Back</button>
+        <span></span>
+      </div>
+    </div>
+    <div class="preview-panel">
+      <div class="preview-puck">
+        <div class="hair-overlay" id="hair-overlay-4"></div>
+      </div>
+      <span class="preview-label">Your keepsake</span>
+      <div class="preview-price-breakdown">
+        <h4>Final price</h4>
+        <div class="price-line"><span>Base price</span><span>SGD $150</span></div>
+        <div class="price-line" id="addon-r" style="display:none;"><span>Add-ons</span><span id="addon-r-v">—</span></div>
+        <div class="price-line" id="attach-r" style="display:none;"><span>Attachment</span><span id="attach-r-v">—</span></div>
+        <div class="price-line total"><span>Total</span><span id="grand-total-4">SGD $150</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STEP 5: PAYMENT ════ -->
+<div class="step-panel" id="step-5">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Step 5 of 6</span></div>
+    <h1 class="step-title">Payment<br /><em>details</em></h1>
+    <p class="step-desc">All transactions are secured and encrypted. We accept the following payment methods.</p>
+  </div>
+
+  <div class="checkout-grid">
+    <div>
+      <div class="payment-methods">
+        <button class="pay-btn selected" id="pay-stripe">
+          <span style="font-size:1rem;">💳</span> Card / Stripe
+        </button>
+        <button class="pay-btn" id="pay-paypal">
+          <span style="color:#003087;font-weight:700;font-size:0.85rem;">Pay</span><span style="color:#009cde;font-weight:700;font-size:0.85rem;">Pal</span>
+        </button>
+        <button class="pay-btn" id="pay-apple">
+          <span style="font-size:1rem;"></span> Apple Pay
+        </button>
+        <button class="pay-btn" id="pay-google">
+          <span style="font-size:1rem;">G</span> Pay
+        </button>
+      </div>
+
+      <div id="card-form">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="As on card" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Card Number</label>
+          <input type="text" class="form-input" placeholder="•••• •••• •••• ••••" maxlength="19" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Expiry</label>
+            <input type="text" class="form-input" placeholder="MM / YY" maxlength="7" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CVV</label>
+            <input type="text" class="form-input" placeholder="•••" maxlength="4" />
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(138,121,104,0.2);padding-top:24px;margin-top:8px;">
+          <p style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--taupe);margin-bottom:16px;">Shipping Address</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" placeholder="Jane" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" placeholder="Doe" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-input" placeholder="Street address" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Postal Code</label>
+              <input type="text" class="form-input" placeholder="123456" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Country</label>
+              <input type="text" class="form-input" placeholder="Singapore" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-nav" style="margin-top:24px;">
+        <button class="btn-ghost" onclick="goToStep(4)">← Back</button>
+        <button class="btn-primary" onclick="goToStep(6)" style="flex:1;margin-left:14px;">Place Order — SGD <span id="pay-total">$150</span></button>
+      </div>
+      <p style="font-size:0.7rem;color:var(--taupe-light);margin-top:12px;text-align:center;">🔒 Secured by Stripe · SSL encrypted</p>
+    </div>
+
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div id="checkout-summary"></div>
+      <div class="order-total">
+        <span>Total</span>
+        <span id="checkout-grand-total">SGD $150</span>
+      </div>
+      <p style="font-size:0.7rem;color:rgba(244,234,222,0.3);margin-top:16px;line-height:1.6;">Inclusive of GST where applicable. Shipping calculated at checkout.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STEP 6: INSTRUCTIONS ════ -->
+<div class="step-panel" id="step-6">
+  <div class="step-header">
+    <div class="step-eyebrow"><div class="step-eyebrow-line"></div><span class="step-eyebrow-text">Order Confirmed</span></div>
+    <h1 class="step-title">Thank you —<br /><em>what happens next.</em></h1>
+  </div>
+
+  <div class="success-screen">
+    <div class="success-circle">
+      <span class="success-check">✦</span>
+    </div>
+    <h2 style="font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.5rem);font-weight:300;color:var(--navy);">Your order is <em style="font-style:italic;color:var(--taupe);">confirmed.</em></h2>
+    <p class="success-body">A confirmation email is on its way to you. To begin crafting your keepsake, please send your pet's hair to our studio at the address below.</p>
+
+    <div class="address-box">
+      <div class="address-box-label">Send your pet's hair to</div>
+      <p>
+        Keepsake Studio — CNC Team<br />
+        [Studio Address Placeholder]<br />
+        Singapore 000000<br />
+        <br />
+        <span style="color:rgba(198,155,60,0.7);font-size:0.78rem;">Ref: Include your order number in the package</span>
+      </p>
+    </div>
+
+    <div class="instruction-steps">
+      <div class="instruction-step">
+        <span class="ins-num">1.</span>
+        <div class="ins-text"><strong>Package your pet's hair</strong>Seal it in a small resealable bag or envelope. Label it with your order number.</div>
+      </div>
+      <div class="instruction-step">
+        <span class="ins-num">2.</span>
+        <div class="ins-text"><strong>Mail it to our studio</strong>Standard post is fine. We recommend tracking for peace of mind.</div>
+      </div>
+      <div class="instruction-step">
+        <span class="ins-num">3.</span>
+        <div class="ins-text"><strong>We begin crafting</strong>Once received, we'll email you to confirm and begin your bespoke piece. Expect 2–3 weeks.</div>
+      </div>
+      <div class="instruction-step">
+        <span class="ins-num">4.</span>
+        <div class="ins-text"><strong>QA & shipping</strong>Your finished keepsake is QA'd, boxed with a founder's note, and shipped to you with tracking.</div>
+      </div>
+      <div class="instruction-step">
+        <span class="ins-num">5.</span>
+        <div class="ins-text"><strong>Tap your keepsake</strong>When it arrives, open the box and tap your phone to the piece to activate your pet's NFC memorial page.</div>
+      </div>
+    </div>
+
+    <a href="feature-x.html" class="btn-primary" style="margin-top:8px;">Learn about the Pet Registry →</a>
+    <a href="index.html" style="font-size:0.78rem;color:var(--taupe);text-decoration:none;letter-spacing:0.1em;">Return to Homepage</a>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ── State ──
+const state = {
+  step: 1,
+  template: { key: 'filled', emoji: '⬤' },
+  addons: [],
+  attachment: { key: 'stainless', price: 0, label: 'Necklace — Stainless Steel' },
+};
+const ADDON_PRICES = { gold: 30, silver: 10, flowers: 15 };
+const ADDON_LABELS = { gold: 'Gold Flakes', silver: 'Silver Flakes', flowers: 'Pressed Flowers' };
+
+function calcTotal() {
+  let t = 150;
+  state.addons.forEach(a => t += ADDON_PRICES[a]);
+  t += state.attachment.price;
+  return t;
+}
+function fmtPrice(n) { return `SGD $${n}`; }
+
+function updatePreviews() {
+  document.querySelectorAll('[id^="hair-overlay"]').forEach(el => {
+    el.textContent = state.template.emoji;
+  });
+  const total = calcTotal();
+  const addonCost = state.addons.reduce((s,a) => s + ADDON_PRICES[a], 0);
+  // update all grand totals
+  ['grand-total','grand-total-2','grand-total-3','grand-total-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = fmtPrice(total);
+  });
+  // addon lines
+  ['addon-summary-line','addon-summary-line2','addon-summary-line3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const disp = document.getElementById(['addon-total-disp','addon-total-disp2','addon-total-disp3'][i]);
+    if (addonCost > 0) { el.style.display='flex'; if(disp) disp.textContent=fmtPrice(addonCost); }
+    else el.style.display='none';
+  });
+  // attach lines
+  ['attach-summary-line','attach-summary-line3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const disp = document.getElementById(['attach-total-disp','attach-total-disp3'][i]);
+    if (state.attachment.price > 0) { el.style.display='flex'; if(disp) disp.textContent=fmtPrice(state.attachment.price); }
+    else el.style.display='none';
+  });
+  // review panel
+  const addonR = document.getElementById('addon-r');
+  const addonRV = document.getElementById('addon-r-v');
+  if (addonR) { addonR.style.display = addonCost > 0 ? 'flex' : 'none'; if(addonRV) addonRV.textContent = fmtPrice(addonCost); }
+  const attachR = document.getElementById('attach-r');
+  const attachRV = document.getElementById('attach-r-v');
+  if (attachR) { attachR.style.display = state.attachment.price > 0 ? 'flex' : 'none'; if(attachRV) attachRV.textContent = fmtPrice(state.attachment.price); }
+  const gt4 = document.getElementById('grand-total-4');
+  if (gt4) gt4.textContent = fmtPrice(total);
+  // pay button
+  const pt = document.getElementById('pay-total');
+  if (pt) pt.textContent = '$' + total;
+  const cgt = document.getElementById('checkout-grand-total');
+  if (cgt) cgt.textContent = fmtPrice(total);
+}
+
+// Template selection
+document.getElementById('template-grid').addEventListener('click', e => {
+  const card = e.target.closest('.template-card');
+  if (!card) return;
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  state.template = { key: card.dataset.template, emoji: card.dataset.emoji || card.querySelector('.template-icon').textContent };
+  updatePreviews();
+});
+
+// Addon selection
+document.querySelectorAll('.addon-row').forEach(row => {
+  row.addEventListener('click', () => {
+    row.classList.toggle('selected');
+    const key = row.dataset.addon;
+    if (state.addons.includes(key)) state.addons = state.addons.filter(a => a !== key);
+    else state.addons.push(key);
+    updatePreviews();
+  });
+});
+
+// Attachment selection
+document.querySelectorAll('.attachment-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.attachment-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.attachment = { key: card.dataset.attach, price: +card.dataset.price, label: card.dataset.label };
+    updatePreviews();
+  });
+});
+
+// Payment method selection
+document.querySelectorAll('.pay-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+});
+
+// Step navigation
+function goToStep(n) {
+  // Populate review/checkout summaries
+  if (n === 4) buildReview();
+  if (n === 5) buildCheckoutSummary();
+
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+
+  document.querySelectorAll('.prog-step').forEach(s => {
+    const sn = +s.dataset.step;
+    s.classList.remove('active','done');
+    if (sn < n) s.classList.add('done');
+    if (sn === n) s.classList.add('active');
+  });
+  state.step = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updatePreviews();
+}
+
+function buildReview() {
+  const el = document.getElementById('review-summary');
+  const total = calcTotal();
+  const addonCost = state.addons.reduce((s,a) => s + ADDON_PRICES[a], 0);
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(138,121,104,0.15);">
+      <div>
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px;">Template</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;">${state.template.emoji} ${state.template.key.charAt(0).toUpperCase() + state.template.key.slice(1)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.65rem;color:var(--taupe);">Base</div>
+        <div style="font-family:var(--font-display);font-size:1rem;">SGD $150</div>
+      </div>
+    </div>
+    ${state.addons.length > 0 ? `
+    <div style="display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid rgba(138,121,104,0.15);">
+      <div>
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px;">Embellishments</div>
+        <div style="font-size:0.88rem;color:var(--navy);">${state.addons.map(a => ADDON_LABELS[a]).join(', ')}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.65rem;color:var(--taupe);">Add-ons</div>
+        <div style="font-family:var(--font-display);font-size:1rem;">SGD $${addonCost}</div>
+      </div>
+    </div>` : ''}
+    <div style="display:flex;justify-content:space-between;padding-top:16px;">
+      <div>
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px;">Attachment</div>
+        <div style="font-size:0.88rem;color:var(--navy);">${state.attachment.label}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.65rem;color:var(--taupe);">Attachment</div>
+        <div style="font-family:var(--font-display);font-size:1rem;">${state.attachment.price === 0 ? 'Free' : 'SGD $' + state.attachment.price}</div>
+      </div>
+    </div>
+    <div style="background:var(--navy);padding:20px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(244,234,222,0.5);">Total</span>
+      <span style="font-family:var(--font-display);font-size:1.6rem;color:var(--gold);">SGD $${total}</span>
+    </div>
+  `;
+}
+
+function buildCheckoutSummary() {
+  const el = document.getElementById('checkout-summary');
+  const total = calcTotal();
+  const addonCost = state.addons.reduce((s,a) => s + ADDON_PRICES[a], 0);
+  el.innerHTML = `
+    <div class="order-item"><span>Bespoke Pet Keepsake</span><span>SGD $150</span></div>
+    ${state.addons.map(a => `<div class="order-item"><span>${ADDON_LABELS[a]}</span><span>SGD $${ADDON_PRICES[a]}</span></div>`).join('')}
+    <div class="order-item"><span>${state.attachment.label}</span><span>${state.attachment.price === 0 ? 'Free' : 'SGD $' + state.attachment.price}</span></div>
+    <div class="order-item"><span>Shipping</span><span>Calculated at dispatch</span></div>
+  `;
+}
+
+// Add to cart and return to shop
+function addToCartAndContinue() {
+  const total = calcTotal();
+  // Persist to localStorage so homepage cart can pick it up
+  const existing = JSON.parse(localStorage.getItem('ks_cart') || '[]');
+  const item = {
+    name: 'Bespoke Pet Keepsake',
+    type: 'bespoke',
+    price: total,
+    drop: null,
+    colors: ['#C69B3C','#8A7968','#0F172A'],
+    template: state.template.key,
+    addons: state.addons,
+    attachment: state.attachment.label,
+    qty: 1
+  };
+  // Avoid duplicate bespoke items
+  const idx = existing.findIndex(i => i.name === 'Bespoke Pet Keepsake');
+  if (idx > -1) existing[idx] = item; else existing.push(item);
+  localStorage.setItem('ks_cart', JSON.stringify(existing));
+  // Redirect back to homepage with cart open
+  window.location.href = 'index.html#shop';
+}
+
+// Init
+updatePreviews();
+</script>
+</body>
+</html>
