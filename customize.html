@@ -101,17 +101,13 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
   display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .preview-puck {
-  width: 160px; height: 120px; border-radius: 50%;
-  background: radial-gradient(ellipse at 38% 32%,
-    rgba(198,155,60,0.6) 0%, rgba(138,121,104,0.5) 40%, rgba(15,23,42,0.9) 80%);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 2px 8px rgba(255,255,255,0.08);
-  position: relative; transition: all 0.5s ease;
+  width: 220px; height: 172px;
+  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.45)) drop-shadow(0 0 30px rgba(198,155,60,0.12));
+  position: relative; transition: filter 0.4s ease;
 }
-.preview-puck .hair-overlay {
-  position: absolute; inset: 8px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.2rem;
-  transition: all 0.4s;
+.preview-puck svg {
+  width: 100%; height: 100%; display: block;
+  transition: opacity 0.3s ease;
 }
 .preview-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(244,234,222,0.4); font-family: var(--font-body); }
 .preview-price-breakdown { width: 100%; }
@@ -134,9 +130,21 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
 }
 .template-card:hover { border-color: rgba(198,155,60,0.4); }
 .template-card.selected { border-color: var(--gold); background: rgba(198,155,60,0.05); }
-.template-icon { font-size: 2.2rem; line-height: 1; }
+.template-icon {
+  width: 92px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.18));
+}
+.template-icon svg { width: 100%; height: 100%; display: block; }
 .template-name { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); font-family: var(--font-body); font-weight: 500; }
 .template-desc { font-size: 0.72rem; color: var(--taupe); line-height: 1.5; }
+
+/* Add-on row mini-preview thumbnail */
+.addon-thumb {
+  width: 56px; height: 44px; flex-shrink: 0;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+}
+.addon-thumb svg { width: 100%; height: 100%; display: block; }
 
 /* ── ADD-ONS ── */
 .addon-grid { display: flex; flex-direction: column; gap: 12px; }
@@ -334,33 +342,33 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
   <div class="step-body">
     <div>
       <div class="template-grid" id="template-grid">
-        <div class="template-card selected" data-template="filled" data-emoji="🟤">
-          <div class="template-icon">⬤</div>
+        <div class="template-card selected" data-template="filled">
+          <div class="template-icon" data-thumb="filled"></div>
           <div class="template-name">Filled</div>
           <div class="template-desc">Hair distributed evenly across the entire piece</div>
         </div>
-        <div class="template-card" data-template="heart" data-emoji="❤️">
-          <div class="template-icon">♥</div>
+        <div class="template-card" data-template="heart">
+          <div class="template-icon" data-thumb="heart"></div>
           <div class="template-name">Heart</div>
           <div class="template-desc">Hair arranged in the shape of a heart</div>
         </div>
-        <div class="template-card" data-template="swirl" data-emoji="🌀">
-          <div class="template-icon">◉</div>
+        <div class="template-card" data-template="swirl">
+          <div class="template-icon" data-thumb="swirl"></div>
           <div class="template-name">Swirl</div>
           <div class="template-desc">Hair swept in a flowing spiral pattern</div>
         </div>
-        <div class="template-card" data-template="bundle" data-emoji="🎋">
-          <div class="template-icon">≡</div>
+        <div class="template-card" data-template="bundle">
+          <div class="template-icon" data-thumb="bundle"></div>
           <div class="template-name">Neat Bundle</div>
           <div class="template-desc">Hair neatly bundled in the centre</div>
         </div>
-        <div class="template-card" data-template="line" data-emoji="〰️">
-          <div class="template-icon">—</div>
+        <div class="template-card" data-template="line">
+          <div class="template-icon" data-thumb="line"></div>
           <div class="template-name">Line</div>
           <div class="template-desc">A single clean strand across the face</div>
         </div>
-        <div class="template-card" data-template="circle" data-emoji="◯">
-          <div class="template-icon">○</div>
+        <div class="template-card" data-template="circle">
+          <div class="template-icon" data-thumb="circle"></div>
           <div class="template-name">Circle</div>
           <div class="template-desc">Hair arranged in a circular ring formation</div>
         </div>
@@ -373,9 +381,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
 
     <!-- Preview -->
     <div class="preview-panel">
-      <div class="preview-puck" id="preview-puck">
-        <div class="hair-overlay" id="hair-overlay">⬤</div>
-      </div>
+      <div class="preview-puck" id="preview-puck"></div>
       <span class="preview-label">Live preview</span>
       <div class="preview-price-breakdown">
         <h4>Your order</h4>
@@ -401,6 +407,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
       <div class="addon-grid">
         <div class="addon-row" data-addon="gold" data-price="30">
           <div class="addon-check">✓</div>
+          <div class="addon-thumb" data-addon-thumb="gold"></div>
           <div class="addon-info">
             <div class="addon-name">Gold Flakes</div>
             <div class="addon-desc">24K gold leaf flakes suspended within the resin</div>
@@ -409,6 +416,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
         </div>
         <div class="addon-row" data-addon="silver" data-price="10">
           <div class="addon-check">✓</div>
+          <div class="addon-thumb" data-addon-thumb="silver"></div>
           <div class="addon-info">
             <div class="addon-name">Silver Flakes</div>
             <div class="addon-desc">Fine silver leaf for a cool metallic shimmer</div>
@@ -417,6 +425,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
         </div>
         <div class="addon-row" data-addon="flowers" data-price="15">
           <div class="addon-check">✓</div>
+          <div class="addon-thumb" data-addon-thumb="flowers"></div>
           <div class="addon-info">
             <div class="addon-name">Pressed Flowers</div>
             <div class="addon-desc">Delicate dried botanicals set alongside the hair</div>
@@ -430,9 +439,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
       </div>
     </div>
     <div class="preview-panel">
-      <div class="preview-puck" id="preview-puck-2">
-        <div class="hair-overlay" id="hair-overlay-2"></div>
-      </div>
+      <div class="preview-puck" id="preview-puck-2"></div>
       <span class="preview-label">Live preview</span>
       <div class="preview-price-breakdown">
         <h4>Your order</h4>
@@ -517,9 +524,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
     </div>
 
     <div class="preview-panel">
-      <div class="preview-puck">
-        <div class="hair-overlay" id="hair-overlay-3"></div>
-      </div>
+      <div class="preview-puck" id="preview-puck-3"></div>
       <span class="preview-label">Live preview</span>
       <div class="preview-price-breakdown">
         <h4>Your order</h4>
@@ -555,9 +560,7 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
       </div>
     </div>
     <div class="preview-panel">
-      <div class="preview-puck">
-        <div class="hair-overlay" id="hair-overlay-4"></div>
-      </div>
+      <div class="preview-puck" id="preview-puck-4"></div>
       <span class="preview-label">Your keepsake</span>
       <div class="preview-price-breakdown">
         <h4>Final price</h4>
@@ -721,11 +724,12 @@ body { background: var(--ivory); color: var(--navy); font-family: var(--font-bod
 
 </div><!-- /page -->
 
+<script src="bespoke-preview-svg.js"></script>
 <script>
 // ── State ──
 const state = {
   step: 1,
-  template: { key: 'filled', emoji: '⬤' },
+  template: { key: 'filled' },
   addons: [],
   attachment: { key: 'stainless', price: 0, label: 'Necklace — Stainless Steel' },
 };
@@ -740,10 +744,52 @@ function calcTotal() {
 }
 function fmtPrice(n) { return `SGD $${n}`; }
 
-function updatePreviews() {
-  document.querySelectorAll('[id^="hair-overlay"]').forEach(el => {
-    el.textContent = state.template.emoji;
+/* ── Bespoke preview rendering ─────────────────────────── */
+const TEMPLATE_LABELS = {
+  filled: 'Filled', heart: 'Heart', swirl: 'Swirl',
+  bundle: 'Neat Bundle', line: 'Line', circle: 'Circle',
+};
+
+function renderTemplateThumbs() {
+  // Small thumbnails inside each template card — no resin, just the formation
+  document.querySelectorAll('[data-thumb]').forEach(el => {
+    el.innerHTML = makeBespokePreviewSVG({
+      w: 92, h: 72,
+      template: el.dataset.thumb,
+      addons: [],
+      seed: 42,
+      showResin: true,
+    });
   });
+}
+
+function renderAddonThumbs() {
+  // Small "filled formation + this addon" preview for each addon row
+  document.querySelectorAll('[data-addon-thumb]').forEach(el => {
+    el.innerHTML = makeBespokePreviewSVG({
+      w: 56, h: 44,
+      template: 'filled',
+      addons: [el.dataset.addonThumb],
+      seed: 12,
+    });
+  });
+}
+
+function renderLivePucks() {
+  ['preview-puck', 'preview-puck-2', 'preview-puck-3', 'preview-puck-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = makeBespokePreviewSVG({
+      w: 220, h: 172,
+      template: state.template.key,
+      addons: state.addons,
+      seed: 77,
+    });
+  });
+}
+
+function updatePreviews() {
+  renderLivePucks();
   const total = calcTotal();
   const addonCost = state.addons.reduce((s,a) => s + ADDON_PRICES[a], 0);
   // update all grand totals
@@ -789,7 +835,7 @@ document.getElementById('template-grid').addEventListener('click', e => {
   if (!card) return;
   document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
-  state.template = { key: card.dataset.template, emoji: card.dataset.emoji || card.querySelector('.template-icon').textContent };
+  state.template = { key: card.dataset.template };
   updatePreviews();
 });
 
@@ -850,7 +896,7 @@ function buildReview() {
     <div style="display:flex;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(138,121,104,0.15);">
       <div>
         <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px;">Template</div>
-        <div style="font-family:var(--font-display);font-size:1.1rem;">${state.template.emoji} ${state.template.key.charAt(0).toUpperCase() + state.template.key.slice(1)}</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;">${TEMPLATE_LABELS[state.template.key] || state.template.key}</div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:0.65rem;color:var(--taupe);">Base</div>
@@ -922,6 +968,8 @@ function addToCartAndContinue() {
 }
 
 // Init
+renderTemplateThumbs();
+renderAddonThumbs();
 updatePreviews();
 </script>
 </body>
